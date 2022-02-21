@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+
+{% block body %}
+<div class="container" style="background: transparent;  border: 2px blue;" id="gen_qa">
+    <form action='/' method="post">
+        <div class="card border bg-transparent "
+             style="max-width: 80rem; margin-top: 5%;  border: 1px solid #0a72d9!important;">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end bg-transparent">
+                <button class="btn btn-primary" type="button" name="{{qa}}" onclick="savepdf(name)" style="background-color: #6666eb;font-weight: bold;
+          border-color: darkblue;">Export PDF <i class="fa fa-solid fa-file-pdf"></i></button>
+                <button class="btn btn-primary" type="button" name="{{qa}}" onclick="savecsv(name)" style="background-color: #6666eb;font-weight: bold;
+          border-color: darkblue;">Export CSV <i class="fas fa-file-csv"></i></button>
+            </div>
+            <div class="card-header"
+                 style="font-size: 22px; border: 2px solid blue; margin-top: 4%; background-color: #6666eb; text-align:center">
+                Question-Answer
+            </div>
+
+            <div class="card-body " id="make_pdf1">
+                <center>
+                    {% for q,a in qa%}
+                    <dl>
+                        <div class="card border mb-2 bg-transparent text-dark" style="max-width: 65rem; ">
+                <textarea id="w3review" name="w3review" rows="4" cols="100" style="background-color: ghostwhite; color: blue; border:  2px solid mediumblue; font-size: 22px; ">
+
+                    Question {{loop.index}}: {{q}}
+                    Answer {{loop.index}}: {{a}}
+                </textarea>
+
+                        </div>
+                    </dl>
+
+                    {% endfor %}
+                </center>
+            </div>
+
+        </div>
+
+    </form>
+</div>
+{% endblock body %}
