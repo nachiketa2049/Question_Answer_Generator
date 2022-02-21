@@ -1,0 +1,97 @@
+.container {
+            margin-top: 0%;
+        }
+
+body {
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    padding: 3px;
+    background-image: url("/static/images/i3.png");
+    border: none;
+
+}
+
+
+textarea::placeholder {
+    color: #4169E1;
+    font-size: 25px;
+}
+
+.button1 {
+    background-color: transparent;
+    color: mediumblue;
+    border: 2px solid #0b0bbd;
+    border-style: double;
+    border-radius: 12px;
+    font-size: 20px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    height: 50px;
+    width: 700px;
+
+}
+
+button[type="submit"]:hover {
+    background-color: lightblue;
+    font-weight: bold;
+    border: 2px solid #0b0bbd;
+    border-style: double;
+}
+
+textarea:focus {
+    border: 10px solid rgb(105, 30, 255);
+    outline: none !important;
+    box-shadow: 0 0 20px #719ECE;
+}
+
+#text_area {
+    border:  3px solid blue;
+    height: 400px;
+    width: 800px;
+    resize: none;
+    background-color: ghostwhite;
+    border-radius: 12px;
+    padding-left: 10px;
+    color: #1341ce;
+    border-color: blue;
+    font-size:18px;
+}
+
+dl {
+
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+
+}
+
+body.div {
+    margin: 50px 0px;
+    padding: 0px;
+    text-align: center;
+    background: transparent;
+}
+
+div.card-header {
+    font-weight: bold;
+    color: white;
+}
+
+textarea#w3review {
+    resize: none;
+    font-weight: bold;
+    color:black;
+    background-color: transparent;
+    border: 2px solid white;
+}
+
+marquee{
+    font-size:30pt;
+    font-weight:bold;
+    color: blue;
+    width:100%;
+    direction:left;
+    height:100px;
+}
