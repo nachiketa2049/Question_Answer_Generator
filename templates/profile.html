@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+<h2 style="text-align: left;">Welcome!! You are in Profile Page!! </h2>
+<div class="profile_details">
+    <p>Your account details are below:</p>
+    <table >
+        <tr>
+            <td>Username:</td>
+            <td>{{ account['user_name'] }}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>{{ account['email'] }}</td>
+        </tr>
+    </table>
+    <br>
+      <div>
+         <a href="{{ url_for('update') }}"><i class="active"><button id="update">Update</button></i></a>
+          <a href="{{ url_for('delete') }}"><button id="delete">Delete</button><i class="active"></i></a>
+          <a href="{{ url_for('resetpwd') }}"><i class="active"></i><button id="reset">Reset Password</button></a>
+          </div>
+</div>
+{% endblock body %}

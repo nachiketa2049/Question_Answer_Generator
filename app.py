@@ -13,7 +13,6 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import re
 from flask_bcrypt import Bcrypt
 import docx2txt
-import smtplib
 import random
 import math
 from flask import Flask

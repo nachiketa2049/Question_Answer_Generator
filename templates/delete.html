@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+{% block title %}Delete Data{% endblock %}
+{% block body %}
+<div class="delete_data">
+    <h2>Delete your Account or Dashboard Data</h2>
+    {{msg}}
+    <form action="{{ url_for('delete') }}" method="post" style="outline:none; text-align:center">
+        <input type="submit" value="Delete your Account" id="delete_acc" name="delete_data">
+        <input type="submit" value="Delete your Dashboard Data" id="delete_dash" name="delete_data">
+    </form>
+</div>
+
+{% endblock body %}

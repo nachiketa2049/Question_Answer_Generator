@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./static/js/script.js"></script>
+</head>
+<body>
+<div class="login">
+    <h1>Forgot Password</h1>
+    <div class="links">
+        <a href="{{ url_for('forgot_pwd') }}" class="active">Forgot Password</a>
+        <a href="{{ url_for('login') }}" class="active" style="border:none">Login</a>
+    </div>
+
+    <form action="{{ url_for('forgot_pwd') }}" method="post">
+        <label for="email">
+            <i class="fas fa-envelope"></i>
+        </label>
+        <input type="text" name="email" placeholder="Email" id="email" required>
+        <div class="msg">{{ msg1 }}</div>
+        <input type="submit" value="Send Password">
+    </form>
+</div>
+</body>
+</html>

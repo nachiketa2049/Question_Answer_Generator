@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./static/js/script.js"></script>
+</head>
+<body>
+<div class="login">
+    <h1>Verify OTP</h1>
+    <div class="links">
+        <a href="{{ url_for('sendotp') }}" class="active">Login with OTP</a>
+    </div>
+
+    <form action="{{ url_for('verify') }}" method="post">
+        <label for="otp">
+            <i class="fas fa-envelope"></i>
+        </label>
+        <input type="text" name="otp" placeholder="OTP" id="otp" required>
+        <div class="msg">{{ msg }}</div>
+        <input type="submit" value="Login">
+    </form>
+</div>
+</body>
+</html>

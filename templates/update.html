@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block title %}Update Data{% endblock %}
+
+{% block body %}
+<div class="container" style="padding: 0; margin-top:-20px">
+    <div class="register">
+        <h1>Update your Data</h1>
+        <form action="{{ url_for('update')}}" method="post" autocomplete="off">
+            <label for="username">
+                <i class="fas fa-user"></i>
+            </label>
+            <input type="text" name="old_username" placeholder="Old Username" id="username1" pattern="[a-zA-Z]+$"
+                   required>
+            <span id="usererror1" class="text-danger font-weight-bold"></span>
+            <label for="username">
+                <i class="fas fa-user"></i>
+            </label>
+            <input type="text" name="username" placeholder="New Username" id="username" pattern="[a-zA-Z]+$" required>
+            <span id="usererror" class="text-danger font-weight-bold"></span>
+
+<!--            <label for="email">-->
+<!--                <i class="fas fa-envelope"></i>-->
+<!--            </label>-->
+<!--            <input type="email" name="email" placeholder="New Email" id="email"-->
+<!--                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Enter Valid email" required><br>-->
+<!--            <span id="emailerror" class="text-danger font-weight-bold"></span>-->
+            <label for="password">
+                <i class="fas fa-lock"></i>
+            </label>
+            <input type="password" name="password" placeholder="New Password" id="password"
+                   pattern="(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+                   title="Must contain at least one number and one uppercase and lowercase letter one special symbol, and at least 8 or more characters"
+                   onChange="onChange()" required>
+            <span id="passerror" class="text-danger font-weight-bold"></span>
+            <label for="confirmpassword">
+                <i class="fas fa-lock"></i>
+            </label>
+            <input type="password" name="conpassword" id="confirmpassword" placeholder="confirm-Password"
+                   onChange="onChange()" required>
+            <div class="msg">{{ msg }}</div>
+            <span id="conpasserror" class="text-danger font-weight-bold"></span>
+            <input type="submit" value="Update">
+
+        </form>
+    </div>
+</div>
+{% endblock body%}
