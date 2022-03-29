@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block title %}Generate Question and Answer{% endblock %}
+
+{% block body %}
+
+<marquee>
+    Welcome to Question-Answer Generator
+</marquee>
+<center>
+    <form action="/generate" method="POST" enctype=multipart/form-data>
+        <div class="container">
+            <label for="chkYes">
+                <div id="dvPassport" style="margin-top: 5px;">
+                    <div id="marginchange">
+                        <input class="radio-with-left-margin" value="test" type="radio" name="inputs"
+                               id="chkYes" onclick="EnableDisableTextBox()"
+                               style="margin-top:-2px; margin-top: -57px; margin-left: -590px; margin-bottom: -56px;">
+                        <b style="font-size:17px;font-family:sans-serif">Input Text</b>
+                    </div>
+                    <div id="txtchange" style="margin-top: 5px;">
+                    <textarea data-min-words='50' id="test" name="test" cols="20" rows="5"
+                              style='resize:none; box-shadow:6px 12px 23px rebeccapurple;' disabled="disabled"
+                              required></textarea>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <label for="chkNo">
+            <div class="container" id="dvPassport12" style="margin-top: 29px;">
+                <input class="radio-with-left-margin" value="link" type="radio" name="inputs" id="chkNo"
+                       onclick="EnableDisableTextBox()" style="margin-left:95px;"> <b style="font-size:17px;font-family:sans-serif;">Input Link</b>
+                <br>
+                <input type="text" name="hidden-other" class="hidden-other" name='link' id="link" disabled="disabled"
+                       pattern="https://.*"
+                       style="margin-left:95px; margin-top:5px; box-shadow:6px 12px 23px rebeccapurple;" required>
+            </div>
+        </label>
+        <br>
+        <label for="fileupload">
+            <div id="dvPassport1" style="margin-top: 40px;">
+                <input class="radio-with-left-margin" type="radio" name="inputs" id="pdf12" value="fileUpload"
+                       onclick="EnableDisableTextBox()" style="margin-left: -616px;"> <b
+                    style="font-size:17px;font-family:sans-serif;">Input Pdf</b>
+                <div id="updbtnchn" style="margin-top:5px; margin-left:-10px">
+                    <input class="ank" id="fileUpload" name="fileUpload" type="file"
+                           onchange="openFile(this)"
+                           disabled="disabled" accept=".docx, .doc" required>
+<!--                    <span id="lblError" style="color: red;"></span>-->
+<!--                    <input type="button" id="btnUpload" style="background-color:#04AA6D" value="Upload">-->
+                </div>
+            </div>
+        </label>
+        <button type="submit" class="button button1">Generate Questions and Answers</button>
+        </div>
+    </form>
+</center>
+
+{% endblock body%}

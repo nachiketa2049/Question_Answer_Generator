@@ -1,107 +1,149 @@
-import string
-import traceback
-import pke
-import torch
-from nltk.corpus import stopwords
-from flashtext import KeywordProcessor
-from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM, T5ForConditionalGeneration, T5Tokenizer
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
+from question_paraphraser import GenerateParaphraseQuestions
+from haystack.nodes import QuestionGenerator
+import re
+import warnings
+import smtplib, ssl
+from app import db, UserData, QuestionAnswer
+#from email.mime.text import MIMEText
 
-def generate_qa(text):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+def generate_question_answer(text,user_id, email):
 
-    question_model = T5ForConditionalGeneration.from_pretrained('ramsrigouthamg/t5_squad_v1')
-    question_tokenizer = T5Tokenizer.from_pretrained('ramsrigouthamg/t5_squad_v1')
-    question_model = question_model.to(device)
+    warnings.simplefilter("ignore")
+    print("started")
 
-    summary_tokenizer = AutoTokenizer.from_pretrained("sshleifer/distilbart-cnn-6-6")
-    summary_model = AutoModelForSeq2SeqLM.from_pretrained("sshleifer/distilbart-cnn-6-6")
-    summarizer = pipeline("summarization", model=summary_model, tokenizer=summary_tokenizer, framework="tf")
-    to_tokenize = text
-    summarized = summarizer(to_tokenize, min_length=75)
+    # Load model for question generation via haystack
+    question_generator = QuestionGenerator(model_name_or_path="valhalla/t5-base-e2e-qg")
 
-    # keyword extraction
-    def multipartite_keyword(text):
-        out = []
-        try:
-            # 1. create a MultipartiteRank extractor.
-            extractor = pke.unsupervised.MultipartiteRank()
+    # generate questions and store it into list make res=question_list
+    question_list = question_generator.generate(text)
 
-            # 2. load the content of the document.
-            extractor.load_document(text)
+    # Load model & tokenizer for answer generation
+    model_name = "deepset/roberta-base-squad2"
+    model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-            # 3. select the longest sequences of nouns and adjectives, that do
-            #    not contain punctuation marks or stopwords as candidates.
-            pos = {'NOUN', 'PROPN', 'ADJ'}
-            stoplist = list(string.punctuation)
-            stoplist += ['-lrb-', '-rrb-', '-lcb-', '-rcb-', '-lsb-', '-rsb-']
-            stoplist += stopwords.words('english')
-            extractor.candidate_selection(pos=pos, stoplist=stoplist)
+    # Generate answers and store it into list ls_answer=answer_list
+    nlp = pipeline('question-answering', model=model, tokenizer=tokenizer)
+    answer_list=[]
+    for i in question_list:
+        QA_input = {
+            'question': i,
+            'context':text
+        }
+        answer_list.append(nlp(QA_input))
 
-            # 4. build the Multipartite graph and rank candidates using random walk,
-            #    alpha controls the weight adjustment mechanism, see TopicRank for
-            #    threshold/method parameters.
-            extractor.candidate_weighting(alpha=1.1,
-                                          threshold=0.74,
-                                          method='average')
+    # Convert one word answer into full sentence
+    full_answer_list=[]
+    for i in range(len(question_list)):
+        full_answer_list.append(re.findall(r"([^.]*{}[^.]*)".format(text[answer_list[i]["start"]:answer_list[i]["end"]]),text))
 
-            # 5. get the 10-highest scored candidates as keyphrases
-            keyphrases = extractor.get_n_best(n=10)
+    #generate paraphrase question
+    paraphrase_question= GenerateParaphraseQuestions()
+    paraphrased_list=[]
+    for i in question_list:
+        payload2 = {
+            "input_text" : i,
+            "max_questions": 3
+        }
+        output = paraphrase_question.paraphrase(payload2)
+        paraphrased_list.append(output['Paraphrased Questions'])
 
-            for val in keyphrases:
-                out.append(val[0])
-        except:
-            out = []
-            traceback.print_exc()
+    #For test purpose to print output just uncomment bolow code
 
-        return out
+    # for i in range(len(res)):
+    #     print(res[i])
+    #     for j in paraphrased_list[i]:
+    #         print(" "+j)
+    #     print('\n')
+    #     print(full_answer_list[i])
+    #     print('\n')
+    #     print('-------------------------------------------------------------------------------------------------')
 
-    summary = summarized[0]['summary_text']
+    # Creating a list for all question answer pairs containing question, paraphrased questions and answer in dictionary
+    # Format be like [{question:'', paraphrase_question:'',answer:''},{question:'', paraphrase_question:'',answer:''}]
 
-    def get_keywords(originaltext, summarytext):
-        keywords = multipartite_keyword(originaltext)
-        print("keywords unsummarized: ", keywords)
-        keyword_processor = KeywordProcessor()
-        for keyword in keywords:
-            keyword_processor.add_keyword(keyword)
+    question_answer_pairs=[]
+    for i in range(len(question_list)):
+        question_answer_dict={}
+        question_answer_dict['Question']=question_list[i]
+        question_answer_dict['Paraphrased_Question'] =paraphrased_list[i]
+        question_answer_dict['Answer']=full_answer_list[i]
+        question_answer_pairs.append(question_answer_dict)
 
-        keywords_found = keyword_processor.extract_keywords(summarytext)
-        keywords_found = list(set(keywords_found))
-        print("keywords_found in summarized: ", keywords_found)
+    user = UserData.query.filter_by(user_id=user_id).first()
+    qa=QuestionAnswer.query.filter_by(user_id=user.user_id).all()
+    if qa:
+        timestamp = qa[-1].timestamp + 1
+    else:
+        timestamp=0
 
-        important_keywords = []
-        for keyword in keywords:
-            if keyword in keywords_found:
-                important_keywords.append(keyword)
+    for question_answer in question_answer_pairs:
+        que_ans = QuestionAnswer(user_id=user.user_id,
+                                 question=question_answer['Question'],
+                                 paraphrased_question=str(question_answer['Paraphrased_Question']),
+                                 answer=question_answer['Answer'][0],
+                                 timestamp=timestamp)
+        db.session.add(que_ans)
+        db.session.commit()
 
-        return important_keywords
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "ankitraina999@gmail.com"  # Enter your address
+    receiver_email = email  # Enter receiver address
+    password = "ajymbevxngqqlykc"
+    message = """\
+Subject: Voila! Your Questions and Answers are ready
+Your Questions and Answers are generated. Kindly check your Dashboard."""
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+    print("ended")
+    return question_answer_pairs
 
-    imp_keywords = get_keywords(to_tokenize, summary)
 
-    def get_question(context, answer, model, tokenizer):
-        text = "context: {} answer: {}".format(context, answer)
-        encoding = tokenizer.encode_plus(text, max_length=384, pad_to_max_length=False, truncation=True,
-                                         return_tensors="pt").to(device)
-        input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
-
-        outs = model.generate(input_ids=input_ids,
-                              attention_mask=attention_mask,
-                              early_stopping=True,
-                              num_beams=5,
-                              num_return_sequences=1,
-                              no_repeat_ngram_size=2,
-                              max_length=72)
-        dec = [tokenizer.decode(ids, skip_special_tokens=True) for ids in outs]
-
-        Question = dec[0].replace("question:", "")
-        Question = Question.strip()
-        return Question
-
-    ls = []
-    for answer in imp_keywords:
-        ques = get_question(summary, answer, question_model, question_tokenizer)
-        q = ques
-        answer.capitalize()
-        b = [q, answer]
-        ls.append(b)
-
-    return tuple(ls)
+# from question_paraphraser import GenerateParaphraseQuestions
+#
+# def generate_question_answer(text,user_id, email):
+#     # #question_answer_pairs = qg.paraphrase()
+#     question_answer_pairs = [{"Question": "How many versions of the remote-work model are there?",
+#                               "Paraphrased_Question": ['Is there a full list of available remote-work models?',
+#                                                        'How many are there?',
+#                                                        'How many versions of remote-work models are there?',
+#                                                        'What are the current versions of remote work models?'],
+#                               "Answer": '''There isn’t a single version for the remote-work model: For most companies,
+#                 working remotely means replicating the activities that usually happened in the office.'''},
+#                              {"Question": "How many versions of the remote-work model are there?",
+#                               "Paraphrased_Question": ['Is there a full list of available remote-work models?',
+#                                                        ' How many are there?',
+#                                                        'How many versions of remote-work models are there?',
+#                                                        'What are the current versions of remote work models?'],
+#                               "Answer": '''There isn’t a single version for the remote-work model: For most companies,
+#                              working remotely means replicating the activities that usually happened in the office.'''},
+#                              {"Question": "How many versions of the remote-work model are there?",
+#                               "Paraphrased_Question": ['Is there a full list of available remote-work models?', ],
+#                               "Answer": '''There isn’t a single version for the remote-work model: For most companies,
+#                              working remotely means replicating the activities that usually happened in the office.'''},
+#                              {"Question": "How many versions of the remote-work model are there?",
+#                               "Paraphrased_Question": ['Is there a full list of available remote-work models?',
+#                                                        'What are the current versions of remote work models?'],
+#                               "Answer": '''There isn’t a single version for the remote-work model: For most companies,
+#                              working remotely means replicating the activities that usually happened in the office.'''},
+#                              {"Question": "How many versions of the remote-work model are there?",
+#                               "Paraphrased_Question": ['Is there a full list of available remote-work models?',
+#                                                        'How many versions of remote-work models are there?',
+#                                                        'What are the current versions of remote work models?'],
+#                               "Answer": '''There isn’t a single version for the remote-work model: For most companies,
+#                              working remotely means replicating the activities that usually happened in the office.'''}
+#                              ]
+#     user = UserData.query.filter_by(user_id=user_id).first()
+#     for question_answer in question_answer_pairs:
+#         que_ans=QuestionAnswer(user_id=user.user_id,
+#                                question=question_answer['Question'],
+#                                paraphrased_question=str(question_answer['Paraphrased_Question']),
+#                                answer=question_answer['Answer'])
+#         db.session.add(que_ans)
+#         db.session.commit()
+#     print(email)
+#     return question_answer_pairs

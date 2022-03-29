@@ -1,41 +1,60 @@
-{% extends 'index.html' %}
-
+{% extends 'layout.html' %}
 {% block body %}
-<div class="container" style="background: transparent;  border: 2px blue;" id="gen_qa">
-    <form action='/' method="post">
+<center>
+    <div class="container" style="background: transparent;  border: none; margin:0;padding:0" id="gen_qa">
         <div class="card border bg-transparent "
-             style="max-width: 80rem; margin-top: 5%;  border: 1px solid #0a72d9!important;">
+             style="max-width: 80rem; margin-top: 5%; padding: 5px; border: 2px solid #04AA6D !important;">
             <div class="d-grid gap-2 d-md-flex justify-content-md-end bg-transparent">
-                <button class="btn btn-primary" type="button" name="{{qa}}" onclick="savepdf(name)" style="background-color: #6666eb;font-weight: bold;
-          border-color: darkblue;">Export PDF <i class="fa fa-solid fa-file-pdf"></i></button>
-                <button class="btn btn-primary" type="button" name="{{qa}}" onclick="savecsv(name)" style="background-color: #6666eb;font-weight: bold;
-          border-color: darkblue;">Export CSV <i class="fas fa-file-csv"></i></button>
+                <button class="btn btn-primary" type="button" name="{{question_answer_list}}" onclick="save_pdf(name)"
+                        style="background-color: #04AA6D;font-weight: bold;
+          border-color:  #04AA6D;">Export PDF <i class="fa fa-solid fa-file-pdf"></i></button>
+                <button class="btn btn-primary" type="button" name="{{question_answer_list}}" onclick="save_csv(name)"
+                        style="background-color:  #04AA6D;font-weight: bold;
+          border-color:  #04AA6D;">Export CSV <i class="fas fa-file-csv"></i></button>
             </div>
             <div class="card-header"
-                 style="font-size: 22px; border: 2px solid blue; margin-top: 4%; background-color: #6666eb; text-align:center">
+                 style="font-size: 22px; border:none; margin-top: 4%; background-color: #04AA6D; text-align:center; color:white;
+                 margin: 24px -6px;">
                 Question-Answer
             </div>
 
-            <div class="card-body " id="make_pdf1">
+            <div class="card-body ">
                 <center>
-                    {% for q,a in qa%}
-                    <dl>
-                        <div class="card border mb-2 bg-transparent text-dark" style="max-width: 65rem; ">
-                <textarea id="w3review" name="w3review" rows="4" cols="100" style="background-color: ghostwhite; color: blue; border:  2px solid mediumblue; font-size: 22px; ">
-
-                    Question {{loop.index}}: {{q}}
-                    Answer {{loop.index}}: {{a}}
-                </textarea>
-
+                    {% for question_answer in question_answer_list%}
+                    <div class="container" style="border:none; padding: 4px; border-radius: 15px;">
+                        <button class="accordion" id="question">Question {{loop.index}}:  {{question_answer['Question']}}</button>
+                        <div class="panel">
+                            {% for paraphrase in question_answer['Paraphrased_Question']%}
+                            <p style="margin-bottom: 0;">({{loop.index}}). {{paraphrase}}</p>
+                            {% endfor %}
                         </div>
-                    </dl>
-
+                        <button class="accordion" id="answer">
+                            Answer {{loop.index}}:  {{question_answer['Answer']}}
+                        </button>
+                    </div>
+                    <br>
                     {% endfor %}
                 </center>
             </div>
-
         </div>
+    </div>
+</center>
+<script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
 
-    </form>
-</div>
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.maxHeight) {
+          panel.style.maxHeight = null;
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + "px";
+        }
+      });
+    }
+
+
+</script>
 {% endblock body %}
