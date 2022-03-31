@@ -5,7 +5,7 @@ import re
 import warnings
 import smtplib, ssl
 from app import db, UserData, QuestionAnswer
-#from email.mime.text import MIMEText
+
 
 def generate_question_answer(text,user_id, email):
 
@@ -15,7 +15,7 @@ def generate_question_answer(text,user_id, email):
     # Load model for question generation via haystack
     question_generator = QuestionGenerator(model_name_or_path="valhalla/t5-base-e2e-qg")
 
-    # generate questions and store it into list make res=question_list
+    # generate questions and store it into list
     question_list = question_generator.generate(text)
 
     # Load model & tokenizer for answer generation
@@ -23,7 +23,7 @@ def generate_question_answer(text,user_id, email):
     model = AutoModelForQuestionAnswering.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    # Generate answers and store it into list ls_answer=answer_list
+    # Generate answers and store it into list
     nlp = pipeline('question-answering', model=model, tokenizer=tokenizer)
     answer_list=[]
     for i in question_list:
@@ -89,8 +89,8 @@ def generate_question_answer(text,user_id, email):
 
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
-    sender_email = "ankitraina999@gmail.com"  # Enter your address
-    receiver_email = email  # Enter receiver address
+    sender_email = "ankitraina999@gmail.com"  # Enter your email address
+    receiver_email = email  # Enter receiver's email address
     password = "ajymbevxngqqlykc"
     message = """\
 Subject: Voila! Your Questions and Answers are ready

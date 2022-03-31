@@ -335,6 +335,9 @@ def generate():
                     text += data.get_text()
                 paras = text.replace('\n', ' ').replace('\r', '')
                 text = unicodedata.normalize("NFKD", paras)
+                text_list = text.split(" ")
+                if len(text_list)>500:
+                    text = " ".join(text_list[:500])
 
             elif inputs == 'fileUpload':
                 # PDF procssing
@@ -359,7 +362,10 @@ def dashboard():
     if 'loggedin' in session:
         question_answer_list=[]
         quest_ans=QuestionAnswer.query.filter_by(user_id=session['id']).all()
-        timestamp = quest_ans[-1].timestamp
+        if len(quest_ans)>0:
+            timestamp = quest_ans[-1].timestamp
+        else:
+            timestamp=0
         question_answer=QuestionAnswer.query.filter_by(user_id=session['id'],timestamp=timestamp).all()
         for i in question_answer:
             qa_dict={"Question":i.question,
@@ -371,5 +377,5 @@ def dashboard():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True,port=8000)
 
