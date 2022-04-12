@@ -8,12 +8,13 @@
     Welcome to Question-Answer Generator
 </marquee>
 <center>
-    <form action="/generate" method="POST" enctype=multipart/form-data>
+    <div id="loader"></div>
+     <form onsubmit="handleFormSubmit(event)" id="my-form" action="/generate" method="POST" enctype=multipart/form-data>
         <div class="container">
             <label for="chkYes">
                 <div id="dvPassport" style="margin-top: 5px;">
                     <div id="marginchange">
-                        <input class="radio-with-left-margin" value="test" type="radio" name="inputs"
+                        <input class="radio-with-left-margin radio-input" value="test" type="radio" name="inputs"
                                id="chkYes" onclick="EnableDisableTextBox()"
                                style="margin-top:-2px; margin-top: -57px; margin-left: -590px; margin-bottom: -56px;">
                         <b style="font-size:17px;font-family:sans-serif">Input Text</b>
@@ -28,7 +29,7 @@
         </div>
         <label for="chkNo">
             <div class="container" id="dvPassport12" style="margin-top: 29px;">
-                <input class="radio-with-left-margin" value="link" type="radio" name="inputs" id="chkNo"
+                <input class="radio-with-left-margin radio-input" value="link" type="radio" name="inputs" id="chkNo"
                        onclick="EnableDisableTextBox()" style="margin-left:95px;"> <b style="font-size:17px;font-family:sans-serif;">Input Link</b>
                 <br>
                 <input type="text" name="hidden-other" class="hidden-other" name='link' id="link" disabled="disabled"
@@ -39,9 +40,9 @@
         <br>
         <label for="fileupload">
             <div id="dvPassport1" style="margin-top: 40px;">
-                <input class="radio-with-left-margin" type="radio" name="inputs" id="pdf12" value="fileUpload"
+                <input class="radio-with-left-margin radio-input" type="radio" name="inputs" id="pdf12" value="fileUpload"
                        onclick="EnableDisableTextBox()" style="margin-left: -616px;"> <b
-                    style="font-size:17px;font-family:sans-serif;">Input Pdf</b>
+                    style="font-size:17px;font-family:sans-serif;">Input Doc</b>
                 <div id="updbtnchn" style="margin-top:5px; margin-left:-10px">
                     <input class="ank" id="fileUpload" name="fileUpload" type="file"
                            onchange="openFile(this)"

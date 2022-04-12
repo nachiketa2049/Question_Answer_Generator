@@ -1,22 +1,21 @@
 import os
 import unicodedata
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename #2.1.0
 import model
-import requests
-from bs4 import BeautifulSoup
+import requests #2.27.1
+from bs4 import BeautifulSoup #4.10.0
 from threading import Thread
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
+from flask_sqlalchemy import SQLAlchemy  #2.5.1
+from sqlalchemy import ForeignKey #1.4.34
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session #2.1.1
 import re
-from flask_bcrypt import Bcrypt
-import docx2txt
+from flask_bcrypt import Bcrypt #3.2.0
+import docx2txt #0.8
 import random
 import math
-from flask import Flask
-from flask_mail import Mail, Message
+from flask_mail import Mail, Message #0.9.1
 from password_generator import gen_password
 
 app = Flask(__name__)
@@ -29,8 +28,8 @@ db = SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = "ankitraina999@gmail.com"
-app.config['MAIL_PASSWORD'] = "ajymbevxngqqlykc"
+app.config['MAIL_USERNAME'] = "nlquest001@gmail.com"
+app.config['MAIL_PASSWORD'] = "tzexydyeosxtbzht"
 mail = Mail(app)
 
 Base = declarative_base()
@@ -109,9 +108,9 @@ def sendotp():
             session['email'] = login.email
 
             msg = Message()
-            msg.subject = "Forgot Password"
+            msg.subject = "Login OTP"
             msg.recipients = [email]
-            msg.sender = "ankitraina999@gmail.com"
+            msg.sender = "nlquest001@gmail.com"
             msg.body = "Hi, your OTP for login is " + OTP
             mail.send(msg)
             msg="OTP sent succesfully.."
@@ -149,7 +148,7 @@ def forgot_pwd():
             msg = Message()
             msg.subject = "Forgot Password"
             msg.recipients = [email]
-            msg.sender = "ankitraina999@gmail.com"
+            msg.sender = "nlquest001@gmail.com"
             msg.body = "Hi, your new Generated password is " + temp_pwd
             mail.send(msg)
             msg1='Password successfully sent to your email. Now you have to go to login page for login again '
@@ -336,8 +335,8 @@ def generate():
                 paras = text.replace('\n', ' ').replace('\r', '')
                 text = unicodedata.normalize("NFKD", paras)
                 text_list = text.split(" ")
-                if len(text_list)>500:
-                    text = " ".join(text_list[:500])
+                if len(text_list)>150:
+                    text = " ".join(text_list[:150])
 
             elif inputs == 'fileUpload':
                 # PDF procssing
@@ -349,12 +348,15 @@ def generate():
                 FileObj = open(open_path, 'rb')
                 text = docx2txt.process(FileObj)
                 text = text.replace('\n', ' ').replace('\t', '').replace('\r', ' ')
-                print(text)
+                text_list = text.split(" ")
+                if len(text_list)>150:
+                    text = " ".join(text_list[:150])
                 FileObj.close()
                 os.remove(open_path)
 
-            Thread(target=model.generate_question_answer, args=(text, session['id'], session['email'])).start()
-            return render_template('home.html')
+            #Thread(target=model.generate_question_answer, args=(text, session['id'], session['email'])).start()
+            model.generate_question_answer(text,session['id'], session['email'])
+            return redirect(url_for('dashboard'))
         return render_template('input.html')
 
 @app.route('/dashboard')
@@ -372,10 +374,10 @@ def dashboard():
                      "Paraphrased_Question":eval(i.paraphrased_question),
                      "Answer":i.answer}
             question_answer_list.append(qa_dict)
-        print(question_answer_list)
+            
         return render_template('generated.html',question_answer_list=question_answer_list)
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=8000)
+    app.run(debug=False)
 

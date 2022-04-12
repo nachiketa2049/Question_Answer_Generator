@@ -39,7 +39,7 @@ class GenerateParaphraseQuestions:
 
         max_len = 256
 
-        encoding = self.tokenizer.encode_plus(text, pad_to_max_length=True, return_tensors="pt")
+        encoding = self.tokenizer.encode_plus(text, padding=True, return_tensors="pt")
         input_ids, attention_masks = encoding["input_ids"].to(self.device), encoding["attention_mask"].to(self.device)
 
         # set top_k = 50 and set top_p = 0.95 and num_return_sequences = 3

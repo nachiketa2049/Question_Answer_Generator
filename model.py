@@ -1,4 +1,5 @@
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
+from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline #4.17.0
+import numpy
 from question_paraphraser import GenerateParaphraseQuestions
 from haystack.nodes import QuestionGenerator
 import re
@@ -8,7 +9,6 @@ from app import db, UserData, QuestionAnswer
 
 
 def generate_question_answer(text,user_id, email):
-
     warnings.simplefilter("ignore")
     print("started")
 
@@ -89,9 +89,9 @@ def generate_question_answer(text,user_id, email):
 
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
-    sender_email = "ankitraina999@gmail.com"  # Enter your email address
+    sender_email = "nlquest001@gmail.com"  # Enter your email address
     receiver_email = email  # Enter receiver's email address
-    password = "ajymbevxngqqlykc"
+    password = "tzexydyeosxtbzht"
     message = """\
 Subject: Voila! Your Questions and Answers are ready
 Your Questions and Answers are generated. Kindly check your Dashboard."""
